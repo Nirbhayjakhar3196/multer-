@@ -1,47 +1,54 @@
-const cloudinary = require("../config/cloudinary")
-const User = require("../models/User")
+const User = require("../models/User");
 
-const uploadImage = async (req, res) => {
+const {
+    uploadToCloudinary,
+} = require("../utils/cloudinaryUtils");
+
+const uploadImage = async (req, res, next) => {
 
     try {
+
         if (!req.file) {
-            return res.status(400).json({ message: "No file uploaded" });
+
+            return res.status(400).json({
+                success: false,
+                message: "No file uploaded",
+            });
+
         }
 
-        const result = await new Promise((resolve , reject) => {
-
-            const stream = cloudinary.uploader.upload_stream(
-
-            {
-                folder : "profiles",
-            },
-            (error , result) => {
-                if(error) reject(error);
-                else resolve(result)
-            }
-                
-            )
-
-            stream.end(req.file.buffer)
-        })
+        const result = await uploadToCloudinary(req.file.buffer);
 
         const user = await User.create({
-            name : "meee",
-            imageUrl : result.secure_url
-        })
 
-        res.json({
-            message : "Upload successfully",
-            user
-        })
+            name: "New",
 
-    } catch (error) {
-        return res.status(400).json({
-            message : "Error Failed",
-            error : error.message
-        })
-        
+            imageUrl: result.secure_url,
+
+            imagePublicId: result.public_id,
+
+        });
+
+        return res.status(201).json({
+
+            success: true,
+
+            message: "Upload successful",
+
+            user,
+
+        });
+
     }
-}
 
-module.exports = {uploadImage}
+    catch (error) {
+
+        next(error);
+
+    }
+
+};
+
+module.exports = {
+    uploadImage,
+};
