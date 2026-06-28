@@ -26,7 +26,7 @@ const uploadImage = async (req, res) => {
         })
 
         const user = await User.create({
-            name : "Nirbhay",
+            name : "meee",
             imageUrl : result.secure_url
         })
 

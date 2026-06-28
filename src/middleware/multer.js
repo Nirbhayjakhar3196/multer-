@@ -2,6 +2,19 @@ const multer = require('multer');
 
 const storage = multer.memoryStorage();
 
+const allowedFileTypes = ['image/jpeg', 'image/png', 'image/webp'];
+
+const fileFilter = (req,file,cb) => {
+
+    if(allowedFileTypes.includes(file.mimetype)){
+        cb(null,true)
+    }
+    else{
+        cb(new Error("Invalid file type. Only JPEG, PNG and WEBP are allowed."), false)
+    }
+
+}
+
 const upload = multer({
 
     storage,
